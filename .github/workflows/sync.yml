@@ -18,15 +18,24 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch: 0
+          token: ${{ secrets.GH_PAT }}
 
-      - name: Sync tags
+      - name: Setup upstream
         run: |
           parent_owner=$(gh repo view $GITHUB_REPOSITORY --json parent --jq '.parent.owner.login')
           parent_name=$(gh repo view $GITHUB_REPOSITORY --json parent --jq '.parent.name')
-          parent_repo="git@github.com:${parent_owner}/${parent_name}.git"
+          parent_repo="https://github.com/${parent_owner}/${parent_name}.git"
           echo "${parent_repo}"
-          git remote add upstream "${parent_repo}" 
-          git fetch --tags --force upstream
-          git push --tags origin
+          git remote add upstream "${parent_repo}"
         env:
           GH_TOKEN: ${{ github.token }}
+
+      - name: Fetch from upstream
+        run: |
+          git fetch --tags --force upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Push tags to origin
+        run: |
+          git push --tags origin
