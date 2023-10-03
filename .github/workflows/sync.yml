@@ -33,8 +33,8 @@ jobs:
 
       - name: Rebase the fault branch
         run: |
-          git config --global user.email "tomasmik@protonmail.com"
-          git config --global user.name "tomasmik"
+          git config --global user.email "core@opentofu.org"
+          git config --global user.name "OpenTofu Core Development Team"
 
           default_branch=$(git symbolic-ref --short HEAD)
           git pull --rebase upstream "$default_branch"
