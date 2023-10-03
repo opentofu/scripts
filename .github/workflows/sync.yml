@@ -1,4 +1,4 @@
-name: Sync fork tags
+name: Sync fork and release
 
 on:
   workflow_call:
@@ -17,6 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           fetch: 0
           token: ${{ secrets.GH_PAT }}
 
@@ -30,7 +31,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: Fetch from upstream
+      - name: Rebase the fault branch
+        run: |
+          git config --global user.email "tomasmik@protonmail.com"
+          git config --global user.name "tomasmik"
+
+          default_branch=$(git symbolic-ref --short HEAD)
+          git pull --rebase upstream "$default_branch"
+          git push origin "$default_branch" --force
+
+      - name: Fetch tags from upstream
         run: |
           git fetch --tags --force upstream
         env:
@@ -39,3 +49,21 @@ jobs:
       - name: Push tags to origin
         run: |
           git push --tags origin
+
+      - name: Check Tags for Releases
+        run: |
+          tags=$(git ls-remote --tags --refs | cut -f2 | sed 's/refs\/tags\///')
+          releases=$(gh release list --exclude-drafts --limit 1000 -R $GITHUB_REPOSITORY)
+
+          for tag in $tags; do
+            if [[ $tag =~ ^v[0-9]+ ]]; then
+              if ! grep -q "$tag" <<< "$releases"; then
+                echo "No release found for tag, will attempt to release: $tag"
+                gh workflow run artifact-release.yml -f tag="$tag" -R $GITHUB_REPOSITORY
+              else
+                echo "Release found for tag: $tag"
+              fi
+            fi
+          done
+        env:
+          GH_TOKEN: ${{ github.token }}
