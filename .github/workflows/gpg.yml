@@ -1,0 +1,75 @@
+name: Run GPG Script
+
+on:
+  workflow_dispatch:
+    inputs:
+      organization:
+        description: 'Name of the organization'
+        required: true
+      secretName:
+        description: 'Name of the secret when set in the settings'
+        required: false
+      visibility:
+        description: 'Visibility of the secret when set in the org settings'
+        required: false
+      gpgName:
+        description: 'Name to use for the gpg key'
+        required: false
+      gpgComment:
+        description: 'Comment to provide in the gpg key'
+        required: false
+      gpgEmail:
+        description: 'Email to use for the gpg key'
+        required: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Setup go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21.1'
+
+    - name: Build and run Go script
+      run: |
+        GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+        ORG="${{ github.event.inputs.organization }}"
+        SECRET_NAME="${{ github.event.inputs.secretName }}"
+        VISIBILITY="${{ github.event.inputs.visibility }}"
+        GPG_NAME="${{ github.event.inputs.gpgName }}"
+        GPG_COMMENT="${{ github.event.inputs.gpgComment }}"
+        GPG_EMAIL="${{ github.event.inputs.gpgEmail }}"
+
+        cmd="cd go/gpg;go mod tidy;go run main.go"
+
+        if [ -n "$ORG" ]; then
+            cmd="$cmd -org \"$ORG\""
+        fi
+
+        if [ -n "$SECRET_NAME" ]; then
+            cmd="$cmd -secret \"$SECRET_NAME\""
+        fi
+
+        if [ -n "$VISIBILITY" ]; then
+            cmd="$cmd -visibility \"$VISIBILITY\""
+        fi
+
+        if [ -n "$GPG_NAME" ]; then
+            cmd="$cmd -gpg-name \"$GPG_NAME\""
+        fi
+
+        if [ -n "$GPG_COMMENT" ]; then
+            cmd="$cmd -gpg-comment \"$GPG_COMMENT\""
+        fi
+
+        if [ -n "$GPG_EMAIL" ]; then
+            cmd="$cmd -gpg-email \"$GPG_EMAIL\""
+        fi
+
+        eval $cmd
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_PAT: ${{ secrets.GH_PAT }}
