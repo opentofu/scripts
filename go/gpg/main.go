@@ -30,7 +30,7 @@ var (
 )
 
 func main() {
-	pat := os.Getenv("GITHUB_PAT")
+	pat = os.Getenv("GITHUB_PAT")
 	if pat == "" {
 		panic("GITHUB_PAT environment variable not set")
 	}

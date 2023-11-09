@@ -1,0 +1,61 @@
+
+name: Run resign Script
+
+on:
+  workflow_dispatch:
+    inputs:
+      owner:
+        description: 'Name of the repo owner'
+        required: true
+      repo:
+        description: 'Name of the repository'
+        required: true
+
+jobs:
+  resign:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21.1'
+
+    - name: Install GPG
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gnupg
+
+    - name: Import GPG Private Key
+      run: |
+        echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --import
+      env:
+        GPG_TTY: /dev/ttys000  # Set the GPG_TTY to avoid issues with pinentry
+
+    - name: Build and run Go script
+      run: |
+        OWNER="${{ github.event.inputs.owner }}"
+        REPO="${{ github.event.inputs.repo }}"
+
+        FINGERPRINT=$(gpg --list-secret-keys --keyid-format LONG | awk '/^sec/{sub(/.*\//, "", $2); print $2; exit}')
+        echo "GPG Fingerprint: $FINGERPRINT"
+
+        cmd="cd go/sign;go mod tidy;go run main.go"
+
+        if [ -n "$OWNER" ]; then
+            cmd="$cmd -owner \"$OWNER\""
+        fi
+        if [ -n "$REPO" ]; then
+            cmd="$cmd -repo \"$REPO\""
+        fi
+        if [ -n "$FINGERPRINT" ]; then
+            cmd="$cmd -fingerprint \"$FINGERPRINT\""
+        fi
+
+        eval $cmd
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_PAT: ${{ secrets.GH_PAT }}
