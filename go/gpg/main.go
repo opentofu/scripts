@@ -58,13 +58,13 @@ func main() {
 		id.SelfSignature = &packet.Signature{
 			CreationTime:              time.Now(),
 			KeyLifetimeSecs:           &keyLifetime,
-			SigType:                   packet.SigTypePositiveCert,
-			PubKeyAlgo:                packet.PubKeyAlgoRSA,
-			Hash:                      config.Hash(),
+			SigType:                   packet.SigTypePositiveCert, // 0x13 [https://datatracker.ietf.org/doc/html/rfc4880#section-5.2.1]
+			PubKeyAlgo:                packet.PubKeyAlgoRSA,  // 1 for RSA (Encrypt or Sign) [https://datatracker.ietf.org/doc/html/rfc4880#section-9.1]
+			Hash:                      config.Hash(), 
 			IssuerKeyId:               &es.PrimaryKey.KeyId,
-			PreferredHash:             []uint8{8},
-			PreferredCompression:      []uint8{2},
-			PreferredSymmetric:        []uint8{9},
+			PreferredHash:             []uint8{8}, // 8 for SHA256 (Encrypt or Sign) [https://datatracker.ietf.org/doc/html/rfc4880#section-9.4]
+			PreferredCompression:      []uint8{2}, // 2 for ZLIB [https://datatracker.ietf.org/doc/html/rfc4880#section-9.3]
+			PreferredSymmetric:        []uint8{9}, // 9 for AES with 256-bit key [https://datatracker.ietf.org/doc/html/rfc4880#section-9.2]
 			IsPrimaryId:               new(bool),
 			FlagsValid:                true,
 			FlagCertify:               false,
