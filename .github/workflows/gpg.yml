@@ -6,11 +6,11 @@ on:
       organization:
         description: 'Name of the organization'
         required: true
+      repo:
+        description: 'Name of the repository'
+        required: true
       secretName:
         description: 'Name of the secret when set in the settings'
-        required: false
-      visibility:
-        description: 'Visibility of the secret when set in the org settings'
         required: false
       gpgName:
         description: 'Name to use for the gpg key'
@@ -22,7 +22,7 @@ on:
         description: 'Email to use for the gpg key'
         required: false
 jobs:
-  build:
+  generate:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,7 +38,7 @@ jobs:
         GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
         ORG="${{ github.event.inputs.organization }}"
         SECRET_NAME="${{ github.event.inputs.secretName }}"
-        VISIBILITY="${{ github.event.inputs.visibility }}"
+        REPO="${{ github.event.inputs.repo}}"
         GPG_NAME="${{ github.event.inputs.gpgName }}"
         GPG_COMMENT="${{ github.event.inputs.gpgComment }}"
         GPG_EMAIL="${{ github.event.inputs.gpgEmail }}"
@@ -49,12 +49,12 @@ jobs:
             cmd="$cmd -org \"$ORG\""
         fi
 
-        if [ -n "$SECRET_NAME" ]; then
-            cmd="$cmd -secret \"$SECRET_NAME\""
+        if [ -n "$REPO" ]; then
+            cmd="$cmd -repo \"$REPO\""
         fi
 
-        if [ -n "$VISIBILITY" ]; then
-            cmd="$cmd -visibility \"$VISIBILITY\""
+        if [ -n "$SECRET_NAME" ]; then
+            cmd="$cmd -secret \"$SECRET_NAME\""
         fi
 
         if [ -n "$GPG_NAME" ]; then

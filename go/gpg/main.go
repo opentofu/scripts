@@ -19,8 +19,8 @@ import (
 
 var (
 	org        = flag.String("org", "", "GitHub organization name")
+	repo       = flag.String("repo", "scripts", "GitHub repo name")
 	secretName = flag.String("secret", "GPG_PRIVATE_KEY", "GitHub organization secret name")
-	visibility = flag.String("visibility", "all", "GitHub organization secret visibility")
 
 	gpgName    = flag.String("gpg-name", "opentofu", "GPG name")
 	gpgComment = flag.String("gpg-comment", "This is the key used to sign opentofu providers", "GPG comment")
@@ -38,33 +38,44 @@ func main() {
 	flag.Parse()
 
 	config := &packet.Config{
-		DefaultCipher:          packet.CipherAES256,
-		DefaultCompressionAlgo: packet.CompressionZLIB,
+		DefaultCipher:          packet.CipherAES256,    // 9 for AES with 256-bit key [https://datatracker.ietf.org/doc/html/rfc4880#section-9.2]
+		DefaultCompressionAlgo: packet.CompressionZLIB, // 2 for ZLIB [https://datatracker.ietf.org/doc/html/rfc4880#section-9.3]
 		CompressionConfig: &packet.CompressionConfig{
-			Level: packet.BestCompression,
+			Level: packet.BestCompression, // 9 for best compression [https://datatracker.ietf.org/doc/html/rfc4880#section-9.3]
 		},
-		RSABits: 4096,
+		RSABits: 4096, // 4096-bit RSA key [https://datatracker.ietf.org/doc/html/rfc4880#section-
 	}
 
+	// Generate a new Entity. Will contain a new key pair and a self-signed identity
+	// which we'll adjust later.
 	es, err := openpgp.NewEntity(*gpgName, *gpgComment, *gpgEmail, config)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	var keyLifetime uint32 = 3 * 365 * 24 * 60 * 60
+	var keyLifetime uint32 = 3 * 365 * 24 * 60 * 60 // 3 years
 
+	// There should be only one identity, but let's iterate over them anyway.
 	for _, id := range es.Identities {
+		// SelfSignature is a key component in OpenPGP for identity verification.
+		// It is a signature made by the owner of the identity on their own public key.
+		//
+		// After setting the SelfSignature, the user ID (name and email) is signed with the entity's
+		// primary key and private key, creating a verifiable signature for future reference.
+		//
+		// This process is crucial in OpenPGP as it allows the owner of an identity to claim
+		// ownership of a public key, and for others to verify that claim.
 		id.SelfSignature = &packet.Signature{
 			CreationTime:              time.Now(),
 			KeyLifetimeSecs:           &keyLifetime,
 			SigType:                   packet.SigTypePositiveCert, // 0x13 [https://datatracker.ietf.org/doc/html/rfc4880#section-5.2.1]
-			PubKeyAlgo:                packet.PubKeyAlgoRSA,  // 1 for RSA (Encrypt or Sign) [https://datatracker.ietf.org/doc/html/rfc4880#section-9.1]
-			Hash:                      config.Hash(), 
-			IssuerKeyId:               &es.PrimaryKey.KeyId,
-			PreferredHash:             []uint8{8}, // 8 for SHA256 (Encrypt or Sign) [https://datatracker.ietf.org/doc/html/rfc4880#section-9.4]
-			PreferredCompression:      []uint8{2}, // 2 for ZLIB [https://datatracker.ietf.org/doc/html/rfc4880#section-9.3]
-			PreferredSymmetric:        []uint8{9}, // 9 for AES with 256-bit key [https://datatracker.ietf.org/doc/html/rfc4880#section-9.2]
+			PubKeyAlgo:                packet.PubKeyAlgoRSA,       // 1 for RSA (Encrypt or Sign) [https://datatracker.ietf.org/doc/html/rfc4880#section-9.1]
+			Hash:                      config.Hash(),
+			IssuerKeyId:               &es.PrimaryKey.KeyId, // Key ID of the signing key
+			PreferredHash:             []uint8{8},           // 8 for SHA256 (Encrypt or Sign) [https://datatracker.ietf.org/doc/html/rfc4880#section-9.4]
+			PreferredCompression:      []uint8{2},           // 2 for ZLIB [https://datatracker.ietf.org/doc/html/rfc4880#section-9.3]
+			PreferredSymmetric:        []uint8{9},           // 9 for AES with 256-bit key [https://datatracker.ietf.org/doc/html/rfc4880#section-9.2]
 			IsPrimaryId:               new(bool),
 			FlagsValid:                true,
 			FlagCertify:               false,
@@ -78,23 +89,33 @@ func main() {
 		}
 	}
 
+	fmt.Println("Generating GPG key...")
 	privateKeyBuffer := new(bytes.Buffer)
 	err = es.SerializePrivate(privateKeyBuffer, config)
 	if err != nil {
 		log.Fatalf("Error serializing key: %v", err)
 	}
 
+	fmt.Println("Setting secret in", *org+"/"+*repo+"...")
 	err = setSecret(context.Background(), privateKeyBuffer.Bytes())
 	if err != nil {
 		log.Fatalf("Error uploading GPG key to GitHub: %v", err)
 	}
+
+	var pb bytes.Buffer
+	if err = es.Serialize(&pb); err != nil {
+		log.Fatalf("Error serializing public key: %v", err)
+	}
+
+	fmt.Println("")
+	fmt.Println("PUBLIC KEY BASE64:")
+	fmt.Println(base64.StdEncoding.EncodeToString(pb.Bytes()))
 }
 
 func setSecret(ctx context.Context, privKey []byte) error {
-	log.Println("Setting secret in", *org, "...")
 
 	g := github.NewTokenClient(nil, pat)
-	k, _, err := g.Actions.GetOrgPublicKey(ctx, *org)
+	k, _, err := g.Actions.GetRepoPublicKey(ctx, *org, *repo)
 	if err != nil {
 		return fmt.Errorf("could not get key: %w", err)
 	}
@@ -104,11 +125,10 @@ func setSecret(ctx context.Context, privKey []byte) error {
 		return fmt.Errorf("could not encode: %w", err)
 	}
 
-	_, err = g.Actions.CreateOrUpdateOrgSecret(ctx, *org, &github.EncryptedSecret{
+	_, err = g.Actions.CreateOrUpdateRepoSecret(ctx, *org, *repo, &github.EncryptedSecret{
 		Name:           *secretName,
 		KeyID:          *k.KeyID,
 		EncryptedValue: en,
-		Visibility:     *visibility,
 	})
 
 	return err
