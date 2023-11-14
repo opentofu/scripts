@@ -6,6 +6,9 @@ on:
 jobs:
   check-releases:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
 
     steps:
     - name: Fetch repositories

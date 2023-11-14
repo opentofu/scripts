@@ -22,6 +22,9 @@ permissions:
 jobs:
   project:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
 
     outputs:
       name: ${{ steps.name.outputs.name }}
@@ -71,6 +74,9 @@ jobs:
 
   provider:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     needs: [project]
 
     outputs:
@@ -114,6 +120,9 @@ jobs:
           - GOOS: darwin
             GOARCH: "arm"
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     needs: [project, provider]
     steps:
       - name: Checkout forker
@@ -205,6 +214,9 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     needs: [project, provider, build]
 
     steps:
