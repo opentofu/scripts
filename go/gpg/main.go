@@ -113,7 +113,6 @@ func main() {
 }
 
 func setSecret(ctx context.Context, privKey []byte) error {
-
 	g := github.NewTokenClient(nil, pat)
 	k, _, err := g.Actions.GetRepoPublicKey(ctx, *org, *repo)
 	if err != nil {
@@ -134,6 +133,9 @@ func setSecret(ctx context.Context, privKey []byte) error {
 	return err
 }
 
+// encodeWithPublicKey encrypts the given text with the given public key.
+// This is required because GitHub only allows us to store secrets encrypted
+// with a public key.
 func encodeWithPublicKey(text string, publicKey string) (string, error) {
 	// Decode the public key from base64
 	publicKeyBytes, err := base64.StdEncoding.DecodeString(publicKey)

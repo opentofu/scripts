@@ -1,4 +1,3 @@
-
 name: Run resign Script
 
 on:
@@ -13,6 +12,7 @@ on:
 
 jobs:
   resign:
+    environment: gpg
     runs-on: ubuntu-latest
 
     steps:
@@ -37,8 +37,8 @@ jobs:
 
     - name: Build and run Go script
       run: |
-        OWNER="${{ github.event.inputs.owner }}"
-        REPO="${{ github.event.inputs.repo }}"
+        OWNER="${{ github.event.inputs.owner}}"
+        REPO="${{ github.event.inputs.repo}}"
 
         FINGERPRINT=$(gpg --list-secret-keys --keyid-format LONG | awk '/^sec/{sub(/.*\//, "", $2); print $2; exit}')
         echo "GPG Fingerprint: $FINGERPRINT"
