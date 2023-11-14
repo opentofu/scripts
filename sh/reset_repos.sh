@@ -7,6 +7,7 @@ do
     case "${flag}" in
         u) URL_FILE=${OPTARG};;
         w) WORKFLOW_DIR=${OPTARG};;
+	*) echo "Usage: $0 -u <URL_FILE> -w <WORKFLOW_DIR>" >&2; exit 1;;
     esac
 done
 
@@ -21,14 +22,14 @@ if [ ! -f "$URL_FILE" ]; then
 fi
 
 while IFS= read -r FORK_URL; do
-  UPSTREAM_URL=$(echo "$FORK_URL" | sed 's/opentofu/terraform-providers/')
+  UPSTREAM_URL=${FORK_URL//opentofu/terraform-providers}
 
   echo "Got fork URL: $FORK_URL"
   echo "Got upstream URL: $UPSTREAM_URL"
 
   git clone "$FORK_URL"
   REPO_NAME="$(basename "$FORK_URL" .git)"
-  cd "$REPO_NAME"
+  popd "$REPO_NAME" || exit 1
 
   git remote add upstream "$UPSTREAM_URL"
   git fetch upstream
@@ -53,7 +54,7 @@ while IFS= read -r FORK_URL; do
 
   git push origin "$MAIN_BRANCH" --force
 
-  cd ..
+  popd || exit 1
 
   echo "Done! Removing $REPO_NAME"
 
