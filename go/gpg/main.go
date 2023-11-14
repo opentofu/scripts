@@ -38,10 +38,10 @@ func main() {
 	flag.Parse()
 
 	config := &packet.Config{
-		DefaultCipher:          packet.CipherAES256,    // 9 for AES with 256-bit key [https://datatracker.ietf.org/doc/html/rfc4880#section-9.2]
-		DefaultCompressionAlgo: packet.CompressionZLIB, // 2 for ZLIB [https://datatracker.ietf.org/doc/html/rfc4880#section-9.3]
+		DefaultCipher:          packet.CipherAES256,    // [https://datatracker.ietf.org/doc/html/rfc4880#section-9.2]
+		DefaultCompressionAlgo: packet.CompressionZLIB, // [https://datatracker.ietf.org/doc/html/rfc4880#section-9.3]
 		CompressionConfig: &packet.CompressionConfig{
-			Level: packet.BestCompression, // 9 for best compression [https://datatracker.ietf.org/doc/html/rfc4880#section-9.3]
+			Level: packet.BestCompression, // [https://datatracker.ietf.org/doc/html/rfc4880#section-9.3]
 		},
 		RSABits: 4096, // 4096-bit RSA key [https://datatracker.ietf.org/doc/html/rfc4880#section-
 	}
@@ -69,13 +69,13 @@ func main() {
 		id.SelfSignature = &packet.Signature{
 			CreationTime:              time.Now(),
 			KeyLifetimeSecs:           &keyLifetime,
-			SigType:                   packet.SigTypePositiveCert, // 0x13 [https://datatracker.ietf.org/doc/html/rfc4880#section-5.2.1]
-			PubKeyAlgo:                packet.PubKeyAlgoRSA,       // 1 for RSA (Encrypt or Sign) [https://datatracker.ietf.org/doc/html/rfc4880#section-9.1]
+			SigType:                   packet.SigTypePositiveCert, // [https://datatracker.ietf.org/doc/html/rfc4880#section-5.2.1]
+			PubKeyAlgo:                packet.PubKeyAlgoRSA,       // [https://datatracker.ietf.org/doc/html/rfc4880#section-9.1]
 			Hash:                      config.Hash(),
-			IssuerKeyId:               &es.PrimaryKey.KeyId, // Key ID of the signing key
-			PreferredHash:             []uint8{8},           // 8 for SHA256 (Encrypt or Sign) [https://datatracker.ietf.org/doc/html/rfc4880#section-9.4]
-			PreferredCompression:      []uint8{2},           // 2 for ZLIB [https://datatracker.ietf.org/doc/html/rfc4880#section-9.3]
-			PreferredSymmetric:        []uint8{9},           // 9 for AES with 256-bit key [https://datatracker.ietf.org/doc/html/rfc4880#section-9.2]
+			IssuerKeyId:               &es.PrimaryKey.KeyId,                   // Key ID of the signing key
+			PreferredHash:             []uint8{8},                             // 8 for SHA256 (Encrypt or Sign) [https://datatracker.ietf.org/doc/html/rfc4880#section-9.4]
+			PreferredCompression:      []uint8{uint8(packet.CompressionZLIB)}, // [https://datatracker.ietf.org/doc/html/rfc4880#section-9.3]
+			PreferredSymmetric:        []uint8{uint8(packet.CipherAES256)},    // [https://datatracker.ietf.org/doc/html/rfc4880#section-9.2]
 			IsPrimaryId:               new(bool),
 			FlagsValid:                true,
 			FlagCertify:               false,

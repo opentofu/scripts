@@ -35,7 +35,6 @@ jobs:
 
     - name: Build and run Go script
       run: |
-        GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
         ORG="${{ github.event.inputs.organization }}"
         SECRET_NAME="${{ github.event.inputs.secretName }}"
         REPO="${{ github.event.inputs.repo}}"

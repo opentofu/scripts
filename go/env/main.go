@@ -16,7 +16,7 @@ import (
 
 var (
 	org  = flag.String("org", "", "GitHub organization name")
-	repo = flag.String("repo-contains", "", "GitHub repo name prefix")
+	repo = flag.String("repo-prefix", "", "GitHub repo name prefix")
 
 	secretName = flag.String("secret-name", "GPG_PRIVATE_KEY", "GitHub organization secret name")
 
@@ -37,6 +37,10 @@ func main() {
 	secretValue = os.Getenv("SECRET_VALUE")
 	if secretValue == "" {
 		panic("SECRET_VALUE environment variable not set")
+	}
+
+	if repo == nil || *repo == "" {
+		panic("repo-prefix flag not set")
 	}
 
 	flag.Parse()
@@ -119,7 +123,7 @@ func getRepositories(owner, nameContains string, includeForks bool) ([]github.Re
 				continue
 			}
 
-			if strings.Contains(*repo.Name, nameContains) {
+			if strings.HasPrefix(*repo.Name, nameContains) {
 				found = append(found, *repo)
 			}
 		}
