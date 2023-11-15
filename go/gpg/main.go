@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ProtonMail/go-crypto/openpgp"
+	"github.com/ProtonMail/go-crypto/openpgp/armor"
 	"github.com/ProtonMail/go-crypto/openpgp/packet"
 	"github.com/google/go-github/v54/github"
 	"golang.org/x/crypto/nacl/box"
@@ -102,14 +103,20 @@ func main() {
 		log.Fatalf("Error uploading GPG key to GitHub: %v", err)
 	}
 
-	var pb bytes.Buffer
-	if err = es.Serialize(&pb); err != nil {
-		log.Fatalf("Error serializing public key: %v", err)
+	var buf bytes.Buffer
+	w, err := armor.Encode(&buf, openpgp.PublicKeyType, nil)
+	if err != nil {
+		log.Fatalf("Error calling armor encode: %v", err)
 	}
 
+	if err = es.Serialize(w); err != nil {
+		log.Fatalf("Error serializing public key: %v", err)
+	}
+	w.Close()
+
 	fmt.Println("")
-	fmt.Println("PUBLIC KEY BASE64:")
-	fmt.Println(base64.StdEncoding.EncodeToString(pb.Bytes()))
+	fmt.Println("PUBLIC KEY:")
+	fmt.Println(buf.String())
 }
 
 func setSecret(ctx context.Context, privKey []byte) error {
