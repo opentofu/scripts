@@ -38,12 +38,12 @@ func main() {
 	if secretValue == "" {
 		panic("SECRET_VALUE environment variable not set")
 	}
+	
+	flag.Parse()
 
 	if repo == nil || *repo == "" {
 		panic("repo-prefix flag not set")
 	}
-
-	flag.Parse()
 
 	c = github.NewTokenClient(context.Background(), pat)
 
