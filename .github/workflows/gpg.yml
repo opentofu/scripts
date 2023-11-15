@@ -24,7 +24,7 @@ on:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    environment: Providers
+    environment: Manage GPG key
 
     steps:
     - name: Checkout code
