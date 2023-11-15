@@ -24,6 +24,7 @@ on:
 jobs:
   generate:
     runs-on: ubuntu-latest
+    environment: Providers
 
     steps:
     - name: Checkout code
