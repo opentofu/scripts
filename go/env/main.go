@@ -38,7 +38,7 @@ func main() {
 	if secretValue == "" {
 		panic("SECRET_VALUE environment variable not set")
 	}
-	
+
 	flag.Parse()
 
 	if repo == nil || *repo == "" {
@@ -70,6 +70,13 @@ func setupEnv(ctx context.Context, repo *github.Repository) error {
 			CustomBranchPolicies: &t,
 			ProtectedBranches:    &f,
 		},
+	})
+	if err != nil {
+		return err
+	}
+
+	_, _, err = c.Repositories.CreateDeploymentBranchPolicy(ctx, repo.GetOwner().GetLogin(), repo.GetName(), *envName, &github.DeploymentBranchPolicyRequest{
+		Name: repo.DefaultBranch,
 	})
 	if err != nil {
 		return err
