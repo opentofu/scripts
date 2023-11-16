@@ -50,7 +50,7 @@ jobs:
         FINGERPRINT=$(gpg --list-secret-keys --keyid-format LONG | awk '/^sec/{sub(/.*\//, "", $2); print $2; exit}')
         echo "GPG Fingerprint: $FINGERPRINT"
 
-        cmd="cd go/sign;go mod tidy;go run main.go"
+        cmd="cd .github/workflows/bin/sign;go mod tidy;go run main.go"
 
         if [ -n "$OWNER" ]; then
             cmd="$cmd -owner \"$OWNER\""
