@@ -12,7 +12,7 @@ on:
       GPG_PRIVATE_KEY:
         required: true
       GPG_PASSPHRASE:
-        required: true
+        required: false
       GORELEASER_KEY:
         required: true
 
@@ -114,6 +114,7 @@ jobs:
           - GOOS: darwin
             GOARCH: "arm"
     runs-on: ubuntu-latest
+    environment: gpg
     needs: [project, provider]
     steps:
       - name: Checkout forker
@@ -150,10 +151,12 @@ jobs:
       - name: Import GPG key
         if: ${{ steps.dist.outputs.support == 'yes' && steps.dist.outputs.ignore == 'no' }}
         id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v5
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --import
+          FINGERPRINT=$(gpg --list-secret-keys --keyid-format LONG | awk '/^sec/{sub(/.*\//, "", $2); print $2; exit}')
+          echo "::set-output name=fingerprint::${FINGERPRINT}"
+        env:
+          GPG_TTY: /dev/ttys000  # Set the GPG_TTY to avoid issues with pinentry
 
       - id: cache
         if: ${{ steps.dist.outputs.support == 'yes' && steps.dist.outputs.ignore == 'no' }}
@@ -205,6 +208,7 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
+    environment: gpg
     needs: [project, provider, build]
 
     steps:
@@ -217,10 +221,12 @@ jobs:
 
       - name: Import GPG key
         id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v5
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --import
+          FINGERPRINT=$(gpg --list-secret-keys --keyid-format LONG | awk '/^sec/{sub(/.*\//, "", $2); print $2; exit}')
+          echo "::set-output name=fingerprint::${FINGERPRINT}"
+        env:
+          GPG_TTY: /dev/ttys000  # Set the GPG_TTY to avoid issues with pinentry
 
       - uses: actions/cache@v3
         with:
