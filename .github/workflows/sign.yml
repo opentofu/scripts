@@ -1,13 +1,20 @@
 name: Run resign Script
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       owner:
         description: 'Name of the repo owner'
+        type: string
         required: true
       repo:
         description: 'Name of the repository'
+        type: string
+        required: true
+    secrets:
+      GPG_PRIVATE_KEY:
+        required: true
+      GH_PAT:
         required: true
 
 jobs:
@@ -37,8 +44,8 @@ jobs:
 
     - name: Build and run Go script
       run: |
-        OWNER="${{ github.event.inputs.owner}}"
-        REPO="${{ github.event.inputs.repo}}"
+        OWNER="${{ inputs.owner }}"
+        REPO="${{ inputs.repo }}"
 
         FINGERPRINT=$(gpg --list-secret-keys --keyid-format LONG | awk '/^sec/{sub(/.*\//, "", $2); print $2; exit}')
         echo "GPG Fingerprint: $FINGERPRINT"
