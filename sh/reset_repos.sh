@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 # Example usage ./reset-repos.sh -u fork_urls.txt -w /Users/tomas/testdir/workflows
+set -o errexit
 
 while getopts u:w: flag
 do
@@ -29,7 +30,7 @@ while IFS= read -r FORK_URL; do
 
   git clone "$FORK_URL"
   REPO_NAME="$(basename "$FORK_URL" .git)"
-  popd "$REPO_NAME" || exit 1
+  cd "$REPO_NAME"
 
   git remote add upstream "$UPSTREAM_URL"
   git fetch upstream
@@ -54,7 +55,7 @@ while IFS= read -r FORK_URL; do
 
   git push origin "$MAIN_BRANCH" --force
 
-  popd || exit 1
+  cd ..
 
   echo "Done! Removing $REPO_NAME"
 
