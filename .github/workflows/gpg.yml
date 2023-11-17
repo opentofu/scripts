@@ -1,0 +1,54 @@
+name: Run GPG Script
+
+on:
+  workflow_dispatch:
+    inputs:
+      organization:
+        description: 'Name of the organization'
+        required: true
+      repo:
+        description: 'Name of the repository'
+        required: true
+      secretName:
+        description: 'Name of the secret when set in the settings'
+        required: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    environment: Manage GPG key
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Setup go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21.1'
+
+    - name: Build and run Go script
+      run: |
+        ORG="${{ github.event.inputs.organization }}"
+        SECRET_NAME="${{ github.event.inputs.secretName }}"
+        REPO="${{ github.event.inputs.repo}}"
+
+        cmd="cd go/gpg;go mod tidy;go run main.go"
+
+        if [ -n "$ORG" ]; then
+            cmd="$cmd -org \"$ORG\""
+        fi
+
+        if [ -n "$REPO" ]; then
+            cmd="$cmd -repo \"$REPO\""
+        fi
+
+        if [ -n "$SECRET_NAME" ]; then
+            cmd="$cmd -secret \"$SECRET_NAME\""
+        fi
+
+        cmd="$cmd -gpg-name \"OpenTofu\" -gpg-comment \"This key is used to sign opentofu providers\" -gpg-email \"core@opentofu.org\""
+
+        eval $cmd
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_PAT: ${{ secrets.GH_PAT }}
