@@ -77,7 +77,7 @@ func resignReleases(ctx context.Context, fingerprint string) error {
 			}
 		}
 		log.Printf("checksum=%d,signature=%d", checksumAssetID, signatureAssetID)
-		if checksumAssetID < 0 || signatureAssetID < 0 {
+		if checksumAssetID < 0 {
 			return fmt.Errorf("could not find %s/%s release %s assets, checksum=%t,signature=%t", *owner, *repo, release.GetTagName(), checksumAssetID < 0, signatureAssetID < 0)
 		}
 		log.Printf("download asset %d as %s", checksumAssetID, checksumAssetName)
@@ -89,9 +89,11 @@ func resignReleases(ctx context.Context, fingerprint string) error {
 		if err != nil {
 			return err
 		}
-		log.Printf("delete asset %d", signatureAssetID)
-		if err := deleteAsset(ctx, signatureAssetID); err != nil {
-			return fmt.Errorf("could not delete %s/%s release %s asset %d: %w", *owner, *repo, release.GetTagName(), signatureAssetID, err)
+		if signatureAssetID > 0 {
+			log.Printf("delete asset %d", signatureAssetID)
+			if err := deleteAsset(ctx, signatureAssetID); err != nil {
+				return fmt.Errorf("could not delete %s/%s release %s asset %d: %w", *owner, *repo, release.GetTagName(), signatureAssetID, err)
+			}
 		}
 		log.Printf("upload asset %s", signatureFilename)
 		if err := uploadAsset(ctx, release.GetID(), filepath.Join(tmpdir, signatureFilename), signatureFilename); err != nil {
