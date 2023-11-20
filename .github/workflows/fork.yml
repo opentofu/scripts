@@ -1,0 +1,50 @@
+name: Fork repositories
+
+on:
+  workflow_dispatch:
+    inputs:
+      owner:
+        description: 'Original owner of the repo to be forked'
+        required: true
+      new-user-owner:
+        description: 'New user owner of the forked repo'
+        required: false
+      new-org-owner:
+        description: 'New organization owner of the forked repo'
+        required: false
+      repo-prefix:
+        description: 'GitHub repo name prefix'
+        required: true
+      include-forks:
+        description: 'Include forked repos when searching for repos ( boolean )'
+        required: false
+
+jobs:
+  fork:
+    runs-on: ubuntu-latest
+    environment: Manage Repositories
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21.1'
+
+    - name: Build and run Go script
+      run: |
+        cmd="cd go/fork; go mod tidy; go run main.go"
+        cmd="$cmd -fork-owner=${{ github.event.inputs.owner }}"
+        cmd="$cmd -new-user-owner=${{ github.event.inputs.new-user-owner }}"
+        cmd="$cmd -new-org-owner=${{ github.event.inputs.new-org-owner }}"
+        cmd="$cmd -repo-prefix=${{ github.event.inputs.repo-prefix }}"
+        if [[ "${{ github.event.inputs.include-forks }}" == "true" ]]; then
+          cmd="$cmd -include-forks"
+        fi
+
+        eval $cmd
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_PAT: ${{ secrets.GH_PAT }}
