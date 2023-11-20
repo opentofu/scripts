@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   resign:
-    uses: opentffoundation/scripts/.github/workflows/sign.yml@main
+    uses: opentofu/scripts/.github/workflows/sign.yml@main
     with:
       owner: ${{ github.repository_owner }}
       repo: ${{ github.event.repository.name }}

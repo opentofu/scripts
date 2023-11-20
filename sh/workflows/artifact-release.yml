@@ -14,7 +14,7 @@ permissions:
 jobs:
   release-dispatch:
     if: inputs.tag != ''
-    uses: opentffoundation/scripts/.github/workflows/release.yml@main
+    uses: opentofu/scripts/.github/workflows/release.yml@main
     with:
       tag: ${{ inputs.tag }}
     secrets:
@@ -24,7 +24,7 @@ jobs:
 
   release-push:
     if: inputs.tag == ''
-    uses: opentffoundation/scripts/.github/workflows/release.yml@main
+    uses: opentofu/scripts/.github/workflows/release.yml@main
     with:
       tag: ${{ github.ref_name }}
     secrets:

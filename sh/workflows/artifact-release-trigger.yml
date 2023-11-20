@@ -9,4 +9,4 @@ permissions:
 
 jobs:
   trigger:
-    uses: opentffoundation/scripts/.github/workflows/trigger.yml@main
+    uses: opentofu/scripts/.github/workflows/trigger.yml@main
