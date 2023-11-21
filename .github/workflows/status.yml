@@ -1,0 +1,50 @@
+name: Report workflow status
+
+on:
+  workflow_dispatch:
+    inputs:
+      owner:
+        description: 'Owner of the repo to be forked'
+        required: true
+      repo-prefix:
+        description: 'GitHub repo name prefix'
+        required: true
+      workflow:
+        description: 'Workflow to show the status of, example: sync.yml'
+        required: true
+      failed-only:
+        description: 'Only show failed workflows'
+        required: false
+      verbose:
+        description: 'Show verbose output'
+        required: false
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Setup go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21.1'
+
+    - name: Build and run Go script
+      run: |
+        cmd="cd go/status;go mod tidy;go run main.go"
+        cmd="$cmd -owner=${{ github.event.inputs.owner }}"
+        cmd="$cmd -repo-prefix=${{ github.event.inputs.repo-prefix }}"
+        cmd="$cmd -workflow=${{ github.event.inputs.workflow }}"
+        if [ "${{ github.event.inputs.failed-only }}" = "true" ]; then
+          cmd="$cmd -failed-only"
+        fi
+        if [ "${{ github.event.inputs.verbose }}" = "true" ]; then
+          cmd="$cmd -verbose"
+        fi
+
+        eval $cmd
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_PAT: ${{ secrets.GH_PAT }}
