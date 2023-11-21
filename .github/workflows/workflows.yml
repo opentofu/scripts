@@ -1,0 +1,44 @@
+name: Trigger workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      owner:
+        description: 'Owner of the repo to be forked'
+        required: true
+      repo-prefix:
+        description: 'GitHub repo name prefix'
+        required: true
+      repo-filter:
+        description: 'Repository list to filter repositories, example: repo1,repo2,repo3'
+        required: false
+      workflow:
+        description: 'Workflow to trigger, example: sync.yml'
+        required: true
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Setup go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21.1'
+
+    - name: Build and run Go script
+      run: |
+        cmd="cd go/workflows;go mod tidy;go run main.go"
+        cmd="$cmd -owner=${{ github.event.inputs.owner }}"
+        cmd="$cmd -repo-prefix=${{ github.event.inputs.repo-prefix }}"
+        cmd="$cmd -workflow=${{ github.event.inputs.workflow }}"
+        if [ -n "${{ github.event.inputs.repo-filter }}" ]; then
+          cmd="$cmd -repo-filter=${{ github.event.inputs.repo-filter }}"
+        fi
+
+        eval $cmd
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_PAT: ${{ secrets.GH_PAT }}

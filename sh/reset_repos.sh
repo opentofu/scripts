@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Example usage ./reset-repos.sh -u fork_urls.txt -w /Users/tomas/testdir/workflows
+# Example usage ./reset-repos.sh -u fork_urls.txt -w ./workflows
 set -o errexit
 
 while getopts u:w: flag
@@ -23,7 +23,9 @@ if [ ! -f "$URL_FILE" ]; then
 fi
 
 while IFS= read -r FORK_URL; do
-  UPSTREAM_URL=${FORK_URL//opentofu/terraform-providers}
+  # Note: Not all providers exist in the same "hashicorp" org, some are in "terraform-providers".
+  # When providing a list of URLs, make sure to not include different upstream orgs.
+  UPSTREAM_URL=${FORK_URL//opentofu/hashicorp}
 
   echo "Got fork URL: $FORK_URL"
   echo "Got upstream URL: $UPSTREAM_URL"
@@ -31,6 +33,9 @@ while IFS= read -r FORK_URL; do
   git clone "$FORK_URL"
   REPO_NAME="$(basename "$FORK_URL" .git)"
   cd "$REPO_NAME"
+
+  git config user.name "OpenTofu Core Development Team"
+  git config user.email "core@opentofu.org"
 
   git remote add upstream "$UPSTREAM_URL"
   git fetch upstream

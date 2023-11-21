@@ -50,6 +50,8 @@ jobs:
         FINGERPRINT=$(gpg --list-secret-keys --keyid-format LONG | awk '/^sec/{sub(/.*\//, "", $2); print $2; exit}')
         echo "GPG Fingerprint: $FINGERPRINT"
 
+        # The golang script has to exist in the repository from which GH action is
+        # executed. When copying workflows make sure to also copy the go sign script.
         cmd="cd .github/workflows/go/sign;go mod tidy;go run main.go"
 
         if [ -n "$OWNER" ]; then

@@ -10,7 +10,7 @@ on:
         description: 'Name of the repository'
         required: true
       secretName:
-        description: 'Name of the secret when set in the settings'
+        description: 'Name of the secret when set in the settings (Optional: already provided by the script)'
         required: false
 
 jobs:
