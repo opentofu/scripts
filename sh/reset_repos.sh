@@ -1,12 +1,14 @@
 #!/bin/bash
 #
 # Example usage ./reset-repos.sh -u fork_urls.txt -w ./workflows
+set -o errexit
 
 while getopts u:w: flag
 do
     case "${flag}" in
         u) URL_FILE=${OPTARG};;
         w) WORKFLOW_DIR=${OPTARG};;
+	*) echo "Usage: $0 -u <URL_FILE> -w <WORKFLOW_DIR>" >&2; exit 1;;
     esac
 done
 
@@ -23,7 +25,7 @@ fi
 while IFS= read -r FORK_URL; do
   # Note: Not all providers exist in the same "hashicorp" org, some are in "terraform-providers".
   # When providing a list of URLs, make sure to not include different upstream orgs.
-  UPSTREAM_URL=$(echo "$FORK_URL" | sed 's/opentofu/hashicop/')
+  UPSTREAM_URL=${FORK_URL//opentofu/hashicorp}
 
   echo "Got fork URL: $FORK_URL"
   echo "Got upstream URL: $UPSTREAM_URL"
