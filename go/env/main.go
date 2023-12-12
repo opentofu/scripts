@@ -15,8 +15,9 @@ import (
 )
 
 var (
-	org  = flag.String("org", "", "GitHub organization name")
-	repo = flag.String("repo-prefix", "", "GitHub repo name prefix")
+	org        = flag.String("org", "", "GitHub organization name")
+	repo       = flag.String("repo", "", "GitHub repo name (exact match)")
+	repoPrefix = flag.String("repo-prefix", "", "GitHub repo name prefix")
 
 	secretName = flag.String("secret-name", "GPG_PRIVATE_KEY", "GitHub organization secret name")
 
@@ -41,13 +42,24 @@ func main() {
 
 	flag.Parse()
 
-	if repo == nil || *repo == "" {
-		panic("repo-prefix flag not set")
+	repoName := ""
+	if repo != nil {
+		repoName = *repo
+	}
+	repoNamePrefix := ""
+	if repoPrefix != nil {
+		repoNamePrefix = *repoPrefix
+	}
+
+	if repoNamePrefix == "" && repoName == "" {
+		panic("neither repo nor repo-prefix flag are set")
+	} else if repoNamePrefix != "" && repoName != "" {
+		panic("please use either repo or repo-prefix, not both")
 	}
 
 	c = github.NewTokenClient(context.Background(), pat)
 
-	repos, err := getRepositories(*org, *repo, true)
+	repos, err := getRepositories(*org, repoName, repoNamePrefix, true)
 	if err != nil {
 		log.Fatalf("failed to resign releases: %v", err)
 	}
@@ -103,7 +115,7 @@ func setupEnv(ctx context.Context, repo *github.Repository) error {
 
 }
 
-func getRepositories(owner, nameContains string, includeForks bool) ([]github.Repository, error) {
+func getRepositories(owner, name string, namePrefix string, includeForks bool) ([]github.Repository, error) {
 	found := make([]github.Repository, 0)
 	nextPage := 1
 	lastCount := 0
@@ -130,7 +142,9 @@ func getRepositories(owner, nameContains string, includeForks bool) ([]github.Re
 				continue
 			}
 
-			if strings.HasPrefix(*repo.Name, nameContains) {
+			if name != "" && *repo.Name == name {
+				return []github.Repository{*repo}, nil
+			} else if namePrefix != "" && strings.HasPrefix(*repo.Name, namePrefix) {
 				found = append(found, *repo)
 			}
 		}
