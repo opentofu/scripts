@@ -61,12 +61,12 @@ func main() {
 
 	repos, err := getRepositories(*org, repoName, repoNamePrefix, true)
 	if err != nil {
-		log.Fatalf("failed to resign releases: %v", err)
+		log.Fatalf("failed to get repositories: %v", err)
 	}
 
 	for i := range repos {
 		if err := setupEnv(context.Background(), &repos[i]); err != nil {
-			log.Fatalf("failed to resign releases: %v", err)
+			log.Fatalf("failed to setup the env in %s: %v", repos[i].GetName(), err)
 		}
 	}
 	fmt.Println("Done!")
