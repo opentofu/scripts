@@ -54,7 +54,7 @@ jobs:
 
       - name: Push tags to origin
         run: |
-          git push --tags origin
+          git push --tags origin --force
 
       - name: Check Tags for Releases
         run: |
