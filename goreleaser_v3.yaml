@@ -4,9 +4,9 @@ builds:
     flags:
       - -mod=readonly
     goos:
+      - darwin
       - linux
       - windows
-      - darwin
       - freebsd
       - openbsd
       - solaris
@@ -16,6 +16,10 @@ builds:
       - arm
       - arm64
     ignore:
+      - goos: darwin
+        goarch: "386"
+      - goos: darwin
+        goarch: arm
       - goos: freebsd
         goarch: arm64
       - goos: openbsd
@@ -28,14 +32,6 @@ builds:
         goarch: arm
       - goos: solaris
         goarch: arm64
-      - goos: windows
-        goarch: arm
-      - goos: windows
-        goarch: arm64
-      - goos: darwin
-        goarch: "386"
-      - goos: darwin
-        goarch: arm
     ldflags:
       - -s -w -X main.Version={{.Version}}
     mod_timestamp: "{{ .CommitTimestamp }}"
