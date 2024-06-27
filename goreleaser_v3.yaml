@@ -4,9 +4,12 @@ builds:
     flags:
       - -mod=readonly
     goos:
-      - darwin
       - linux
       - windows
+      - darwin
+      - freebsd
+      - openbsd
+      - solaris
     goarch:
       - "386"
       - amd64
