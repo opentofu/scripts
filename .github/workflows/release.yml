@@ -187,7 +187,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
-          version: nightly
+          version: v2.2.0
           args: release --clean --split --timeout 120m --config ${{ github.workspace }}/forker/goreleaser_v1.yaml
           workdir: ${{ needs.provider.outputs.dir }}
         env:
@@ -204,7 +204,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
-          version: nightly
+          version: v2.2.0
           args: release --clean --split --timeout 120m --config ${{ github.workspace }}/forker/${{ (startsWith(needs.project.outputs.goversion, '1.11') || startsWith(needs.project.outputs.goversion, '1.12') || startsWith(needs.project.outputs.goversion, '1.13') || startsWith(needs.project.outputs.goversion, '1.14') || startsWith(needs.project.outputs.goversion, '1.15')) && 'goreleaser_v2.yaml' || 'goreleaser_v3.yaml' }}
           workdir: ${{ needs.provider.outputs.dir }}
         env:
@@ -315,7 +315,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
-          version: nightly
+          version: v2.2.0
           args: continue --merge --timeout 120m
           workdir: ${{ needs.provider.outputs.dir }}
         env:
@@ -330,7 +330,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
-          version: nightly
+          version: v2.2.0
           args: continue --merge --timeout 120m
           workdir: ${{ needs.provider.outputs.dir }}
         env:
