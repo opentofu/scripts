@@ -155,7 +155,7 @@ func forkOne(ctx context.Context, repo string) (bool, error) {
 		opts.Organization = *newOrgOwner
 	}
 
-	_, _, err := c.Repositories.CreateFork(ctx, *newUserOwner, repo, opts)
+	_, _, err := c.Repositories.CreateFork(ctx, *forkOwner, repo, opts)
 	if err != nil {
 		if strings.Contains(err.Error(), "403 was submitted too quickly") || strings.Contains(err.Error(), "500") {
 			return false, nil
