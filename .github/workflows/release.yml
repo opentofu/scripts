@@ -149,7 +149,7 @@ jobs:
         id: dist
         run: |
           echo "support=$(go tool dist list | grep -q "^${{ matrix.GOOS }}/${{ matrix.GOARCH }}$" && echo yes || echo no)" >> "$GITHUB_OUTPUT"
-          echo "ignore=$(grep -q "^${{ needs.provider.outputs.name }}_${{ inputs.tag }}_${{ matrix.GOOS }}_${{ matrix.GOARCH }}$" ${{ github.workspace }}/forker/dist_ignore && echo yes || echo no)" >> "$GITHUB_OUTPUT"
+          echo "ignore=$(grep -q "^${{ needs.project.outputs.name }}_${{ inputs.tag }}_${{ matrix.GOOS }}_${{ matrix.GOARCH }}$" ${{ github.workspace }}/forker/dist_ignore && echo yes || echo no)" >> "$GITHUB_OUTPUT"
 
       - name: Install packages
         if: ${{ steps.dist.outputs.support == 'yes' && steps.dist.outputs.ignore == 'no' }}
