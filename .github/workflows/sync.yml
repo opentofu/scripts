@@ -62,7 +62,7 @@ jobs:
 
           for tag in $tags; do
             if [[ $tag =~ ^v[0-9]+ ]]; then
-              if ! grep -q -x "$tag" <<< "$releases"; then
+              if ! grep -q "$tag" <<< "$releases"; then
                 echo "No release found for tag, will attempt to release: $tag"
                 gh workflow run artifact-release.yml -f tag="$tag" -R $GITHUB_REPOSITORY
               else
