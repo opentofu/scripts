@@ -58,11 +58,11 @@ jobs:
       - name: Check Tags for Releases
         run: |
           tags=$(git ls-remote --tags --refs | cut -f2 | sed 's/refs\/tags\///')
-          releases=$(gh release list --exclude-drafts --limit 1000 -R $GITHUB_REPOSITORY)
+          releases=$(gh release list --exclude-drafts --json tagName --limit 1000 -R $GITHUB_REPOSITORY --jq '.[].tagName')
 
           for tag in $tags; do
             if [[ $tag =~ ^v[0-9]+ ]]; then
-              if ! grep -q "$tag" <<< "$releases"; then
+              if ! grep -q "^$tag$" <<< "$releases"; then
                 echo "No release found for tag, will attempt to release: $tag"
                 gh workflow run artifact-release.yml -f tag="$tag" -R $GITHUB_REPOSITORY
               else
