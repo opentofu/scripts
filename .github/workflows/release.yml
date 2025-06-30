@@ -182,6 +182,12 @@ jobs:
           test -d "${{ needs.provider.outputs.dir }}/vendor" && yq -i '(.builds[0].flags = ["-mod=vendor"]) | (.gomod.mod = "vendor")' "forker/goreleaser_v3.yaml"
           cat "forker/goreleaser_v3.yaml"
 
+      - run: |
+          if [ "${{ needs.project.outputs.name }}" = "terraform-provider-boundary" ] && [ -f "forker/goreleaser_terraform-provider-boundary.yaml" ]; then
+            test -d "${{ needs.provider.outputs.dir }}/vendor" && yq -i '(.builds[0].flags = ["-mod=vendor"]) | (.gomod.mod = "vendor")' "forker/goreleaser_terraform-provider-boundary.yaml"
+            cat "forker/goreleaser_terraform-provider-boundary.yaml"
+          fi
+
       - name: Run goreleaser (GOPATH)
         if: ${{ steps.cache.outputs.cache-hit != 'true' && needs.project.outputs.gomod != 'yes' && steps.dist.outputs.support == 'yes' && steps.dist.outputs.ignore == 'no' }}
         uses: goreleaser/goreleaser-action@v4
@@ -205,7 +211,7 @@ jobs:
         with:
           distribution: goreleaser-pro
           version: v2.2.0
-          args: release --clean --split --timeout 120m --config ${{ github.workspace }}/forker/${{ (startsWith(needs.project.outputs.goversion, '1.11') || startsWith(needs.project.outputs.goversion, '1.12') || startsWith(needs.project.outputs.goversion, '1.13') || startsWith(needs.project.outputs.goversion, '1.14') || startsWith(needs.project.outputs.goversion, '1.15')) && 'goreleaser_v2.yaml' || 'goreleaser_v3.yaml' }}
+          args: release --clean --split --timeout 120m --config ${{ github.workspace }}/forker/${{ needs.project.outputs.name == 'terraform-provider-boundary' && 'goreleaser_terraform-provider-boundary.yaml' || (startsWith(needs.project.outputs.goversion, '1.11') || startsWith(needs.project.outputs.goversion, '1.12') || startsWith(needs.project.outputs.goversion, '1.13') || startsWith(needs.project.outputs.goversion, '1.14') || startsWith(needs.project.outputs.goversion, '1.15')) && 'goreleaser_v2.yaml' || 'goreleaser_v3.yaml' }}
           workdir: ${{ needs.provider.outputs.dir }}
         env:
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
