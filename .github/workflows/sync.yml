@@ -62,6 +62,24 @@ jobs:
 
           for tag in $tags; do
             if [[ $tag =~ ^v[0-9]+ ]]; then
+              # Blacklist specific problematic versions
+              if [[ "$GITHUB_REPOSITORY" == "opentofu/terraform-provider-nomad" && "$tag" == "v1.4.10" ]]; then
+                echo "Skipping $tag: Requires go.mod updates that break the build"
+                continue
+              fi
+              if [[ "$GITHUB_REPOSITORY" == "opentofu/terraform-provider-nomad" && "$tag" == "v1.4.5" ]]; then
+                echo "Skipping $tag: Has inconsistent vendoring"
+                continue
+              fi
+              if [[ "$GITHUB_REPOSITORY" == "opentofu/terraform-provider-awscc" && "$tag" == "v0.0.1" ]]; then
+                echo "Skipping $tag: Cannot reference github.com/hashicorp/aws-sdk-go-private"
+                continue
+              fi
+              if [[ "$GITHUB_REPOSITORY" == "opentofu/terraform-provider-awscc" && ("$tag" == "v0.0.2" || "$tag" == "v0.0.3" || "$tag" == "v0.0.4") ]]; then
+                echo "Skipping $tag: Cannot reference github.com/hashicorp/aws-sdk-go-v2-service-cloudformation-private"
+                continue
+              fi
+              
               if ! grep -q "^$tag$" <<< "$releases"; then
                 echo "No release found for tag, will attempt to release: $tag"
                 gh workflow run artifact-release.yml -f tag="$tag" -R $GITHUB_REPOSITORY
