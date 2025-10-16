@@ -53,7 +53,7 @@ jobs:
 
       - name: Push tags to origin
         run: |
-          git push --tags origin --force
+          git push --tags origin
 
       - name: Check Tags for Releases
         run: |
@@ -77,6 +77,10 @@ jobs:
               fi
               if [[ "$GITHUB_REPOSITORY" == "opentofu/terraform-provider-awscc" && ("$tag" == "v0.0.2" || "$tag" == "v0.0.3" || "$tag" == "v0.0.4") ]]; then
                 echo "Skipping $tag: Cannot reference github.com/hashicorp/aws-sdk-go-v2-service-cloudformation-private"
+                continue
+              fi
+              if [[ "$GITHUB_REPOSITORY" == "opentofu/terraform-provider-vsphere" && "$tag" == "v0.1.0" ]]; then
+                echo "Skipping $tag: Build script incorrectly references golang version 0.0.0"
                 continue
               fi
               
