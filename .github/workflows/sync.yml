@@ -63,12 +63,16 @@ jobs:
           for tag in $tags; do
             if [[ $tag =~ ^v[0-9]+ ]]; then
               # Blacklist specific problematic versions
+              if [[ "$GITHUB_REPOSITORY" == "opentofu/terraform-provider-ultradns" && "$tag" == "v0.1.1" ]]; then
+                echo "Skipping $tag: Inconsistent go vendoring on this particular version"
+                continue
+              fi
               if [[ "$GITHUB_REPOSITORY" == "opentofu/terraform-provider-nomad" && "$tag" == "v1.4.10" ]]; then
                 echo "Skipping $tag: Requires go.mod updates that break the build"
                 continue
               fi
               if [[ "$GITHUB_REPOSITORY" == "opentofu/terraform-provider-nomad" && "$tag" == "v1.4.5" ]]; then
-                echo "Skipping $tag: Has inconsistent vendoring"
+                echo "Skipping $tag: Inconsistent go vendoring on this particular version"
                 continue
               fi
               if [[ "$GITHUB_REPOSITORY" == "opentofu/terraform-provider-awscc" && "$tag" == "v0.0.1" ]]; then
