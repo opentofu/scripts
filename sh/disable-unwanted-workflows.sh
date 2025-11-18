@@ -1,29 +1,31 @@
 #!/bin/bash
-# This script processes all the repos prefixed with `terraform-provider` from a given GitHub organisation
-# and disables any workflow that is not in ./workflows.
+# This script processes all the repos given in a file and disables any workflow that is not in the directory of workflows.
 #
 # To run this, you need to have `gh` tool installed: https://cli.github.com/ and to be logged in accordingly.
-usage () {
-    cat <<HELP_USAGE
-$0 <github org>
+#
+# The repositories in the given file should be in the following format: <owner>/<repo> (e.g.: opentofu/terraform-provider-aws)
+# To know what workflows to disable, it lists the files inside the workflows directory and for any workflow file found in
+# any given repo, it checks to be named the same with one in the workflows dir. If not, it will disable the workflow.
+while getopts r:w: flag
+do
+    case "${flag}" in
+        r) REPOS_FILE=${OPTARG};;
+        w) WORKFLOW_DIR=${OPTARG};;
+	*) echo "Usage: $0 -r <REPOS_FILE> -w <WORKFLOW_DIR>" >&2; exit 1;;
+    esac
+done
 
-<github org>  The organisation (or owner) of the repositories to be processed
-HELP_USAGE
-}
-
-if [ $# -ne 1 ]; then
-  usage;
+if [ -z "$REPOS_FILE" ] || [ -z "$WORKFLOW_DIR" ]; then
+  echo "Usage: $0 -r <REPOS_FILE> -w <WORKFLOW_DIR>"
   exit 1
 fi
-owner="$1"
 
-if [ -z "${owner}" ]; then
-  echo "empty github organisation"
-  usage;
+if [ ! -f "$REPOS_FILE" ]; then
+  echo "File '$REPOS_FILE' not found."
   exit 1
 fi
 
-wanted_workflows="$(ls -A1 ./workflows)"
+wanted_workflows="$(ls -A1 "${WORKFLOW_DIR}")"
 
 while IFS= read -r repo; do
   echo "Processing ${repo}"
@@ -37,4 +39,4 @@ while IFS= read -r repo; do
     printf "\tProcessing %s from %s (DONE)\n" "${wf_file}" "${repo}"
   done <<< "$(gh workflow list --repo "${repo}" --json path --jq '.[].path' | rev | cut -d'/' -f1 | rev)"
   printf "Processing %s (DONE)\n" "${repo}"
-done <<< "$(gh repo list "${owner}" --json name,isArchived,owner --limit 300 --jq '.[] | select(.name | startswith("terraform-provider")) | select (.isArchived == false) | .owner.login+"/"+.name')"
+done < "$REPOS_FILE"
