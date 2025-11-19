@@ -45,7 +45,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_PAT }}
-          repository: opentffoundation/scripts
+          repository: opentofu/scripts
           path: forker
 
       - name: Determine name
@@ -91,7 +91,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_PAT }}
-          repository: opentffoundation/scripts
+          repository: opentofu/scripts
           path: forker
 
       - name: Determine dir
@@ -133,7 +133,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_PAT }}
-          repository: opentffoundation/scripts
+          repository: opentofu/scripts
           path: forker
 
       - name: Checkout provider
