@@ -1,3 +1,4 @@
+# Trigger for the go/workflows/main.go script. Check go/workflows/readme.md for more details.
 name: Trigger workflow
 
 on:
