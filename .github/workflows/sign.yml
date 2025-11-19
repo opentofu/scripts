@@ -1,3 +1,4 @@
+# Trigger for the go/sign/main.go script. Check go/sign/readme.md for more details.
 name: Run resign Script
 
 on:
