@@ -1,3 +1,6 @@
+# This workflow is strictly a template. This is not meant to be executed from the current repo but
+# by the [sh/workflows/artifact-release.yml](../../sh/workflows/artifact-release.yml) that is
+# added in all `terraform-provider-*` repos.
 name: Forker release
 
 on:
