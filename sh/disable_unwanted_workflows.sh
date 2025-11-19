@@ -6,6 +6,8 @@
 # The repositories in the given file should be in the following format: <owner>/<repo> (e.g.: opentofu/terraform-provider-aws)
 # To know what workflows to disable, it lists the files inside the workflows directory and for any workflow file found in
 # any given repo, it checks to be named the same with one in the workflows dir. If not, it will disable the workflow.
+#
+# Example usage: ./disable_unwanted_workflows.sh -r repos_file -w "$(pwd)/workflows"
 while getopts r:w: flag
 do
     case "${flag}" in
@@ -15,18 +17,10 @@ do
     esac
 done
 
-if [ -z "$REPOS_FILE" ] || [ -z "$WORKFLOW_DIR" ]; then
-  echo "Usage: $0 -r <REPOS_FILE> -w <WORKFLOW_DIR>"
-  exit 1
-fi
-
-if [ ! -f "$REPOS_FILE" ]; then
-  echo "File '$REPOS_FILE' not found."
-  exit 1
-fi
+{ [ -z "$REPOS_FILE" ] || [ -z "$WORKFLOW_DIR" ]; } && echo "Usage: $0 -r <REPOS_FILE> -w <WORKFLOW_DIR>" && exit 1
+[ ! -f "$REPOS_FILE" ] && echo "File '$REPOS_FILE' not found." && exit 1
 
 wanted_workflows="$(ls -A1 "${WORKFLOW_DIR}")"
-
 while IFS= read -r repo; do
   echo "Processing ${repo}"
   while IFS= read -r wf_file; do

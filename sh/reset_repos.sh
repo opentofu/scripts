@@ -1,6 +1,12 @@
 #!/bin/bash
+# For each repo in a given file, it's cloning it, setting the upstream repo (by replacing `opentofu` with `hashicorp` namespace) and
+# resets the given repo main branch to the upstream one. After this has been done, it adds the workflow files from the -w argument directory
+# into `.github/workflows` and adds a new commit and pushes it.
 #
-# Example usage ./reset-repos.sh -u fork_urls.txt -w ./workflows
+# Each line of the file given by the -u argument should be a fully qualified url of the repository that wants to be processed.
+# E.g.: https://github.com/opentofu/terraform-provider-arukas
+
+# Example usage: ./reset-repos.sh -u fork_urls -w "$(pwd)/workflows"
 set -o errexit
 
 while getopts u:w: flag
@@ -12,15 +18,8 @@ do
     esac
 done
 
-if [ -z "$URL_FILE" ] || [ -z "$WORKFLOW_DIR" ]; then
-  echo "Usage: $0 -u <URL_FILE> -w <WORKFLOW_DIR>"
-  exit 1
-fi
-
-if [ ! -f "$URL_FILE" ]; then
-  echo "File '$URL_FILE' not found."
-  exit 1
-fi
+{ [ -z "$URL_FILE" ] || [ -z "$WORKFLOW_DIR" ]; } && echo "Usage: $0 -u <URL_FILE> -w <WORKFLOW_DIR>" && exit 1
+[ ! -f "$URL_FILE" ] && echo "File '$URL_FILE' not found." && exit 1
 
 while IFS= read -r FORK_URL; do
   # Note: Not all providers exist in the same "hashicorp" org, some are in "terraform-providers".
