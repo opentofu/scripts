@@ -1,6 +1,18 @@
 # OpenTofu Scripts
 
-This repository contains a collection of scripts and github actions which are used by OpenTofu to manage and maintain repositories and their contents. The scripts are made to be executed using GitHub Actions.
+This repository contains a collection of scripts and github actions which are used by OpenTofu to manage and maintain repositories and their contents. 
+The scripts are made to be executed using GitHub Actions.
+
+## You opened this repository because you want to...
+* Blacklist a specific terraform-provider-* repository tag because the build is failing due to a reason outside of our control, check the last step from [`sync.yml`](./.github/workflows/sync.yml).
+* Refresh the terraform-provider-* `.github/workflows` content, you might need to run [`./sh/reset_repos.sh`](./sh/reset_repos.sh) (details in [sh/readme.md](./sh/readme.md)).
+* Disable newly introduced workflows from upstream on a terraform-provider-* repository that we are not interested in. You could run [`./sh/disable_unwanted_workflows.sh`](./sh/disable_unwanted_workflows.sh) (details in [sh/readme.md](./sh/readme.md)).
+* There is a new provider that you want to fork on our side: 
+  * run the [`fork.yml`](./.github/workflows/fork.yml) workflow for that specific upstream repo to fork it on the OpenTofu's organisation.
+  * run the [`env.yml`](./.github/workflows/env.yml) workflow for the newly forked repo to setup the build environment with the GPG private key.
+  * run the [`secret.yml`](./.github/workflows/secret.yml) workflow for the newly forked repo to configure other secrets than the GPG related information.
+  * run the [`reset_repos.sh`](./sh/reset_repos.sh) script to configure the newly provider with the OpenTofu's specific workflows.
+  * run the [`disable_unwanted_workflows.sh`](./sh/disable_unwanted_workflows.sh) to disable all the other workflows that are not needed by OpenTofu from that repo.
 
 ## Contents
 
