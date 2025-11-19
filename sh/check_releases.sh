@@ -1,8 +1,19 @@
 #!/bin/bash
+# This checks if each tag from of a repository has an associated release entry.
+#
+# Requires 2 inputs:
+# * A file that should contain the repositories that will do the check against.
+# * An environment variable "GITHUB_PAT" that should point to a GitHub Access Token with enough rights to read the tags and releases of the repos contained by the file above.
+#
+# The repositories in the given file should be in the following format: <owner>/<repo> (e.g.: opentofu/terraform-provider-aws)
+#
+# Example usage: GITHUB_PAT=<token> ./check_releases.sh repos_file
+
+[ -z "${GITHUB_PAT}" ] && echo "Expected GITHUB_PAT environment variable is missing" && exit 1
+[ $# -ne 1 ] && echo "Usage: $0 <REPOS_FILE>" && exit 1
 
 GITHUB_TOKEN="$GITHUB_PAT"
-
-REPO_LIST_FILE="./local/repositories.txt"
+REPO_LIST_FILE="$1"
 
 # Read each line from the file
 while IFS= read -r repo; do

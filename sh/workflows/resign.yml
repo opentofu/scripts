@@ -8,10 +8,18 @@ permissions:
 
 jobs:
   resign:
-    uses: opentofu/scripts/.github/workflows/sign.yml@main
-    with:
-      owner: ${{ github.repository_owner }}
-      repo: ${{ github.event.repository.name }}
-    secrets:
-      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-      GH_PAT: ${{ secrets.GH_PAT }}
+    steps:
+      - name: Fail fast
+        run: echo "Run this workflow from the https://github.com/opentofu/scripts/tree/main/.github/workflows/sign.yml instead" && exit 1
+# Disabled on purpose since this cannot work on the terraform-provider-* repos because it
+# uses a go script from the "scripts" repo that is not available when this workflow is not
+# executed from the same repo as the go script.
+# To run this workflow on a terraform-provider repo, it needs to be executed from the
+# "scripts" repo directly
+#    uses: opentofu/scripts/.github/workflows/sign.yml@main
+#    with:
+#      owner: ${{ github.repository_owner }}
+#      repo: ${{ github.event.repository.name }}
+#    secrets:
+#      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+#      GH_PAT: ${{ secrets.GH_PAT }}
