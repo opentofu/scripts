@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   project:
-    runs-on: default-sized-provider-builder
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
@@ -119,7 +119,7 @@ jobs:
             GOARCH: "386"
           - GOOS: darwin
             GOARCH: "arm"
-    runs-on: ubuntu-latest
+    runs-on: default-sized-provider-builder
     defaults:
       run:
         shell: bash
@@ -216,7 +216,7 @@ jobs:
           GGOARCH: ${{ matrix.GOARCH }}
 
   release:
-    runs-on: ubuntu-latest
+    runs-on: default-sized-provider-builder
     defaults:
       run:
         shell: bash
