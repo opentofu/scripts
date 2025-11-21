@@ -1,3 +1,4 @@
+# Trigger for the go/status/main.go script. Check go/status/readme.md for more details.
 name: Report workflow status
 
 on:
