@@ -1,3 +1,4 @@
+# Trigger for the go/fork/main.go script. Check go/fork/readme.md for more details.
 name: Fork repositories
 
 on:

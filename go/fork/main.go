@@ -14,10 +14,8 @@ import (
 )
 
 var (
-	forkOwner = flag.String("fork-owner", "", "Orginal owner of the repo to be forked")
-
-	newUserOwner = flag.String("new-user-owner", "", "New user owner of the forked repo")
-	newOrgOwner  = flag.String("new-org-owner", "", "New organization owner of the forked repo")
+	forkOwner   = flag.String("fork-owner", "", "Orginal owner of the repo to be forked")
+	newOrgOwner = flag.String("new-org-owner", "", "New organization owner of the forked repo")
 
 	repoPrefix   = flag.String("repo-prefix", "", "GitHub repo name prefix")
 	includeForks = flag.Bool("include-forks", false, "Include forked repos when searching for repos")

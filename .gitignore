@@ -1,4 +1,4 @@
-
 dist/
 sh/local
 go/gpg/mypubkey.gpg
+.idea

@@ -15,7 +15,7 @@ var (
 	owner      = flag.String("owner", "", "Owner of the repo to be forked")
 	repoPrefix = flag.String("repo-prefix", "", "GitHub repo name prefix")
 	repoFilter = flag.String("repo-filter", "", "Repository list to filter repositories, example: repo1,repo2,repo3")
-	workflow   = flag.String("workflow", "", "Workflow to trigger, example: sync.yml")
+	workflow   = flag.String("workflow", "", "Workflow to trigger, example: fork_sync.yml")
 
 	pat string
 

@@ -1,3 +1,4 @@
+# Trigger for the go/gpg/main.go script. Check go/gpg/readme.md for more details.
 name: Run GPG Script
 
 on:
