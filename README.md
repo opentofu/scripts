@@ -75,7 +75,10 @@ Necessary when required to regenerate the `SHA256SUM.sig` of all the releases of
 This can generate new GPG keys for the provider repositories to use those for signing new releases.
 > [!WARNING]
 > From the looks of it, in the [gpg script](./go/gpg/main.go), the lifespan of such keys is hardcoded to 3 years.
-> This script might need to be executed for all the repositories when the keys will expire.
+>
+> As noted in [this comment](https://github.com/opentofu/scripts/pull/42#discussion_r2681571489), several days before the 3 years mark, we will have to run this to regenerate the keys for the provider repositories. 
+> Since [OpenTofu allows expired keys for releases](https://github.com/opentofu/opentofu/issues/673), even if this is forgotten, the releases should be created nonetheless. This ensures that even the releases will be signed with an expired key, the day by day activities will not be disrupted.
+
 ### [`workflows.yml`](./.github/workflows/workflows.yml)
 This can trigger a workflow in a terraform-provider-* repository. Generally, we don't have access to trigger the workflows manually in those repositories so we can use this one to do so.
 ### [`release.yml`](./.github/workflows/release.yml) (template)
