@@ -1,7 +1,8 @@
 builds:
   - env:
       - CGO_ENABLED=0
-    flags: []
+    flags:
+      - -buildvcs=false # https://github.com/golang/go/issues/77020
     goos:
       - darwin
       - linux
