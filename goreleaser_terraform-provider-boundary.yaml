@@ -2,14 +2,15 @@ before:
   hooks:
     - cmd: "./scripts/plugins.sh"
       env:
-        - GOOS={{ .Os }}
-        - GOARCH={{ .Arch }}
+        - GOOS={{ .Env.GGOOS }} # Use the environment variables from the env directly because goreleaser has not got acceess to them in before hooks.
+        - GOARCH={{ .Env.GGOARCH }}
 
 builds:
   - env:
       - CGO_ENABLED=0
     flags:
       - -mod=readonly
+      - -buildvcs=false # https://github.com/golang/go/issues/77020
     goos:
       - darwin
       - linux
