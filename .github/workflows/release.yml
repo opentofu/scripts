@@ -323,6 +323,42 @@ jobs:
           key: darwin-arm64-${{ inputs.tag }}
           fail-on-cache-miss: true
 
+      - uses: actions/cache@v3
+        with:
+          path: ${{ needs.provider.outputs.dir }}/dist/freebsd_386
+          key: freebsd-386-${{ inputs.tag }}
+          fail-on-cache-miss: true
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ needs.provider.outputs.dir }}/dist/freebsd_amd64
+          key: freebsd-amd64-${{ inputs.tag }}
+          fail-on-cache-miss: true
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ needs.provider.outputs.dir }}/dist/freebsd_arm
+          key: freebsd-arm-${{ inputs.tag }}
+          fail-on-cache-miss: true
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ needs.provider.outputs.dir }}/dist/openbsd_386
+          key: openbsd-386-${{ inputs.tag }}
+          fail-on-cache-miss: true
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ needs.provider.outputs.dir }}/dist/openbsd_amd64
+          key: openbsd-amd64-${{ inputs.tag }}
+          fail-on-cache-miss: true
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ needs.provider.outputs.dir }}/dist/solaris_amd64
+          key: solaris-amd64-${{ inputs.tag }}
+          fail-on-cache-miss: true
+
       - run: ls -l ${{ needs.provider.outputs.dir }}/dist
 
       - run: find ${{ needs.provider.outputs.dir }}/dist
