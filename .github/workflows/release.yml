@@ -115,13 +115,25 @@ jobs:
   build:
     strategy:
       matrix:
-        GOOS: ["linux", "windows", "darwin"]
+        GOOS: ["linux", "windows", "darwin", "freebsd", "openbsd", "solaris"]
         GOARCH: ["386", "amd64", "arm", "arm64"]
         exclude:
           - GOOS: darwin
             GOARCH: "386"
           - GOOS: darwin
             GOARCH: "arm"
+          - GOOS: freebsd
+            GOARCH: "arm64"
+          - GOOS: openbsd
+            GOARCH: "arm"
+          - GOOS: openbsd
+            GOARCH: "arm64"
+          - GOOS: solaris
+            GOARCH: "386"
+          - GOOS: solaris
+            GOARCH: "arm"
+          - GOOS: solaris
+            GOARCH: "arm64"
     runs-on: default-sized-provider-builder
     defaults:
       run:
