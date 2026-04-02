@@ -36,13 +36,13 @@ jobs:
 
     steps:
       - name: Checkout provider
-        uses: actions/checkout@v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
         with:
           ref: ${{ inputs.tag }}
           path: provider
 
       - name: Checkout forker
-        uses: actions/checkout@v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
         with:
           token: ${{ secrets.GH_PAT }}
           repository: opentofu/scripts
@@ -88,7 +88,7 @@ jobs:
 
     steps:
       - name: Checkout forker
-        uses: actions/checkout@v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
         with:
           token: ${{ secrets.GH_PAT }}
           repository: opentofu/scripts
@@ -142,21 +142,21 @@ jobs:
     needs: [project, provider]
     steps:
       - name: Checkout forker
-        uses: actions/checkout@v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
         with:
           token: ${{ secrets.GH_PAT }}
           repository: opentofu/scripts
           path: forker
 
       - name: Checkout provider
-        uses: actions/checkout@v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
         with:
           ref: ${{ inputs.tag }}
           fetch-depth: 0
           path: ${{ needs.provider.outputs.dir }}
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
         with:
           go-version: ${{ needs.project.outputs.goversion }}
 
@@ -184,7 +184,7 @@ jobs:
 
       - id: cache
         if: ${{ steps.dist.outputs.support == 'yes' && steps.dist.outputs.ignore == 'no' }}
-        uses: actions/cache@v3
+        uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/${{ matrix.GOOS }}_${{ matrix.GOARCH }}
           key: ${{ matrix.GOOS }}-${{ matrix.GOARCH }}-${{ inputs.tag }}
@@ -205,7 +205,7 @@ jobs:
 
       - name: Run goreleaser (GOPATH)
         if: ${{ steps.cache.outputs.cache-hit != 'true' && needs.project.outputs.gomod != 'yes' && steps.dist.outputs.support == 'yes' && steps.dist.outputs.ignore == 'no' }}
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@5fdedb94abba051217030cc86d4523cf3f02243d # v4
         with:
           distribution: goreleaser-pro
           version: v2.2.0
@@ -222,7 +222,7 @@ jobs:
 
       - name: Run goreleaser (gomod)
         if: ${{ steps.cache.outputs.cache-hit != 'true' && needs.project.outputs.gomod == 'yes' && steps.dist.outputs.support == 'yes' && steps.dist.outputs.ignore == 'no' }}
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@5fdedb94abba051217030cc86d4523cf3f02243d # v4
         with:
           distribution: goreleaser-pro
           version: v2.2.0
@@ -246,7 +246,7 @@ jobs:
 
     steps:
       - name: Checkout provider
-        uses: actions/checkout@v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
         with:
           ref: ${{ inputs.tag }}
           fetch-depth: 0
@@ -261,99 +261,99 @@ jobs:
         env:
           GPG_TTY: /dev/ttys000  # Set the GPG_TTY to avoid issues with pinentry
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/linux_386
           key: linux-386-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/linux_amd64
           key: linux-amd64-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/linux_arm
           key: linux-arm-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/linux_arm64
           key: linux-arm64-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/windows_386
           key: windows-386-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/windows_amd64
           key: windows-amd64-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         id: cache_windows_arm
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/windows_arm
           key: windows-arm-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         id: cache_windows_arm64
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/windows_arm64
           key: windows-arm64-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/darwin_amd64
           key: darwin-amd64-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/darwin_arm64
           key: darwin-arm64-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/freebsd_386
           key: freebsd-386-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/freebsd_amd64
           key: freebsd-amd64-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/freebsd_arm
           key: freebsd-arm-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/openbsd_386
           key: openbsd-386-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/openbsd_amd64
           key: openbsd-amd64-${{ inputs.tag }}
           fail-on-cache-miss: true
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@6f8efc29b200d32929f49075959781ed54ec270c # v3
         with:
           path: ${{ needs.provider.outputs.dir }}/dist/solaris_amd64
           key: solaris-amd64-${{ inputs.tag }}
@@ -369,7 +369,7 @@ jobs:
 
       - name: Run goreleaser (GOPATH)
         if: ${{ steps.cache.outputs.cache-hit != 'true' && needs.project.outputs.gomod != 'yes' }}
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@5fdedb94abba051217030cc86d4523cf3f02243d # v4
         with:
           distribution: goreleaser-pro
           version: v2.2.0
@@ -384,7 +384,7 @@ jobs:
 
       - name: Run goreleaser (gomod)
         if: ${{ steps.cache.outputs.cache-hit != 'true' && needs.project.outputs.gomod == 'yes' }}
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@5fdedb94abba051217030cc86d4523cf3f02243d # v4
         with:
           distribution: goreleaser-pro
           version: v2.2.0
