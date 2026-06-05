@@ -1,0 +1,96 @@
+# Workflow that is used in other repos to check the copyright headers
+name: Check copyright headers
+
+on:
+  workflow_call:
+    inputs:
+      header-to-check:
+        description: 'Contains the template of the header to be checked for'
+        default: "Copyright (c) The OpenTofu Authors\nSPDX-License-Identifier: MPL-2.0\nCopyright (c) 2023 HashiCorp, Inc.\nSPDX-License-Identifier: MPL-2.0\n"
+        type: string
+      search-patterns:
+        description: 'A list of patterns to search separated by spaces'
+        default: '"*.go" "*.proto"'
+        type: string
+      ignore-patterns:
+        description: 'A list of patterns to ignore separated by spaces'
+        default: '"*/.git*" "*/vendor/*" "*/node_modules/*"'
+        type: string
+jobs:
+  copyright:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - name: Validate Header Compliance
+        run: |
+          is_generated() {
+            if grep -q -E '(^.{1,2} Code generated .* DO NOT EDIT\.\r?$)' "$1"; then
+              return 0
+            fi
+            return 1
+          }
+          # Removes the year from the expected header and inlines everything  
+          cleanup_header() {
+            echo "$1" | sed -E 's/[0-9]{4}-[0-9]{4}//g;s/[0-9]{4}//g;' | tr '\n' ' '
+          }
+          
+          # Process the header to check against and print it
+          header_to_use=$(printf "${{ inputs.header-to-check }}\n")
+          header_lines=$(echo "${header_to_use}" | wc -l)
+          clean_header="$(cleanup_header "${header_to_use}")"
+          printf "Copyright checker %s\n\n" "${clean_header}"
+          
+          include_patterns=(${{ inputs.search-patterns }})
+          ignore_paths=(${{ inputs.ignore-patterns }})
+          
+          find_args=(".")
+          if [ ${#ignore_paths[@]} -gt 0 ]; then
+            find_args+=("(")
+            for i in "${!ignore_paths[@]}"; do
+              if [ "$i" -gt 0 ]; then find_args+=("-o"); fi
+              find_args+=("-path" "${ignore_paths[$i]}")
+            done
+            find_args+=(")" "-prune" "-o")
+          fi
+          
+          find_args+=("(")
+          for i in "${!include_patterns[@]}"; do
+            if [ "$i" -gt 0 ]; then find_args+=("-o"); fi
+            find_args+=("-name" "${include_patterns[$i]}")
+          done
+          find_args+=(")" "-print")
+          
+          echo "Find command ready: find ${find_args[@]}"
+          echo "Scanning files for copyright headers..."
+          
+          mismatched_count=0
+          scanned_count=0
+          while IFS= read -r file; do
+            ((scanned_count++))
+          
+            if is_generated "${file}"; then
+            echo "Skipping: '${file}' is a generated file."
+              continue
+            fi
+            
+            # Read the first N lines of the source file depending on the template length.
+            # Also, cleanup the comment syntax from the headers and inline everything
+            file_header="$(head -n "${header_lines}" "${file}" | sed -e 's#^//##' -e 's/^#//' -e 's/^\s*//' || true)"
+            clean_file_header="$(cleanup_header "${file_header}")"
+          
+            if ! echo "${clean_file_header}" | grep -q "^${clean_header}$"; then
+              printf "ERROR: %s missing or not matching the expected header.\n\tWanted:\n\t\t%s\n\tGot:\n\t\t%s\n" "${file}" "${clean_header}" "${clean_file_header}"
+              ((mismatched_count++))
+            fi
+          done < <(find "${find_args[@]}")
+          
+          printf "\nScan Summary: scanned=%d, mismatched=%d\n" ${scanned_count} ${mismatched_count}
+            
+          if [ "${mismatched_count}" -gt 0 ]; then
+            echo >&2 "ERROR: some files are missing required copyright headers"
+            exit 1
+          fi
+          exit 0
+        shell: bash {0}
