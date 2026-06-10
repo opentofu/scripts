@@ -26,3 +26,7 @@ This is really useful when wanting to propagate (or refresh) the workflows manag
 ### [`disable_unwanted_workflows.sh`](./disable_unwanted_workflows.sh)
 This gets a file with repositories and disables all of their workflows that are not in the above mentioned workflows directory.
 This is meant to be used to disable any workflow that is inherited from the forked repo that is not necessary in the OpenTofu world.
+
+### [`copyright_check.sh`](./copyright_check.sh)
+This checks the indicated files for the given copyright header. This is used in the whole organisation to check
+for the required copyright headers.
