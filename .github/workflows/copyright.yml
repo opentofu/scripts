@@ -6,8 +6,8 @@ on:
     inputs:
       header-to-check:
         description: 'Contains the template of the header to be checked for'
-        default: "Copyright (c) The OpenTofu Authors\nSPDX-License-Identifier: MPL-2.0\nCopyright (c) 2023 HashiCorp, Inc.\nSPDX-License-Identifier: MPL-2.0\n"
         type: string
+        required: false
       search-patterns:
         description: 'A list of patterns to search separated by spaces'
         default: "*.go *.proto"

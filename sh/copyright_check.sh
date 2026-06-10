@@ -25,8 +25,16 @@ cleanup_header() {
   echo "$1" | sed -E 's/[0-9]{4}-[0-9]{4}//g;s/[0-9]{4}//g;' | tr '\n' ' '
 }
 
+header="Copyright (c) The OpenTofu Authors
+SPDX-License-Identifier: MPL-2.0
+Copyright (c) 2023 HashiCorp, Inc.
+SPDX-License-Identifier: MPL-2.0
+"
+if [ -n "${1}" ]; then
+  header="${1}"
+fi
 # Process the header to check against and print it
-header_to_use=$(printf "%s" "${1}")
+header_to_use=$(printf "%s" "${header}")
 header_lines=$(echo "${header_to_use}" | wc -l)
 clean_header="$(cleanup_header "${header_to_use}")"
 printf "Header to check:\n---\n%s\n---\n" "${clean_header}"
