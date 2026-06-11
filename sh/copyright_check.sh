@@ -20,9 +20,9 @@ is_generated() {
   fi
   return 1
 }
-# Removes the year from the expected header and inlines everything
+# Removes the year from the expected header and inlines everything. Additionally, replaces any double space with a single one
 cleanup_header() {
-  echo "$1" | sed -E 's/[0-9]{4}-[0-9]{4}//g;s/[0-9]{4}//g;' | tr '\n' ' '
+  echo "$1" | sed -E 's/[0-9]{4}-[0-9]{4}//g;s/[0-9]{4}//g;' | tr '\n' ' ' | sed 's/  / /g'
 }
 
 header="Copyright (c) The OpenTofu Authors
