@@ -11,7 +11,7 @@
 # * A string containing space separated patterns for the paths to be included in the scan (e.g.: '"*.go" "*.proto"')
 # * A string containing space separated patterns for files or paths to ignore (e.g.: '"*/.git*" "*/vendor/*" "*/node_modules/*"')
 #
-# Example usage: ./copyright_check.sh "Copyright (c) The OpenTofu Authors\nSPDX-License-Identifier: MPL-2.0\nCopyright (c) 2023 HashiCorp, Inc.\nSPDX-License-Identifier: MPL-2.0\n" '"*.go" "*.proto"' '"*/.git*" "*/vendor/*" "*/node_modules/*"'
+# Example usage: ./copyright_check.sh "Copyright (c) The OpenTofu Authors\nSPDX-License-Identifier: MPL-2.0\nCopyright (c) 2023 HashiCorp, Inc.\nSPDX-License-Identifier: MPL-2.0\n" "*.go *.proto" "*/.git* */vendor/* */node_modules/*"
 
 
 is_generated() {
