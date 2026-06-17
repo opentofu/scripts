@@ -30,7 +30,7 @@ jobs:
         with:
           fetch-depth: '1'
           repository: 'opentofu/scripts'
-          ref: 'copyright-workflow-bash'
+          ref: 'main'
           path: './scripts'
       - name: Validate Header Compliance
         run: |
