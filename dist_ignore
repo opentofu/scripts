@@ -1,3 +1,8 @@
+terraform-provider-boundary_v1.6.1_windows_arm
+terraform-provider-boundary_v1.6.1_windows_arm64
+terraform-provider-boundary_v1.6.1_openbsd_386
+terraform-provider-boundary_v1.6.1_openbsd_amd64
+terraform-provider-boundary_v1.6.1_solaris_amd64
 terraform-provider-boundary_v1.6.0_windows_arm
 terraform-provider-boundary_v1.6.0_windows_arm64
 terraform-provider-boundary_v1.6.0_openbsd_386
