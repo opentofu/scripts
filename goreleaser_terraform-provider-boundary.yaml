@@ -40,6 +40,21 @@ builds:
         goarch: arm
       - goos: solaris
         goarch: arm64
+      # The plugins/kms package only ships go:embed asset files for a fixed
+      # set of platforms (darwin, freebsd, linux, windows/386, windows/amd64),
+      # so these targets always fail with "undefined: content" regardless of
+      # provider version. Ignoring them here (rather than per-tag in
+      # dist_ignore) means this doesn't need to be re-added for every release.
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: arm64
+      - goos: openbsd
+        goarch: "386"
+      - goos: openbsd
+        goarch: amd64
+      - goos: solaris
+        goarch: amd64
     ldflags:
       - -s -w -X main.Version={{.Version}}
     mod_timestamp: "{{ .CommitTimestamp }}"
